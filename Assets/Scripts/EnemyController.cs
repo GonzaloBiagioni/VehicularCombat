@@ -4,98 +4,53 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    public float speed = 4.0f;
+    public float detectionRange = 150.0f;
+    public int damageAmount = 1;
+    private Transform player;
+    private float cooldownTime = 1.0f;
+    private float nextDamageTime = 0.0f;
     public int maxHealth = 3;
     private int currentHealth;
-    public float moveSpeed = 3f;
-    public float detectionRange = 10f;
-    public int damageAmount = 1; 
-    public float attackCooldown = 1f;
-
-    private Transform player;
-    private bool isPlayerInRange = false;
-    private bool canAttack = true;
 
     void Start()
     {
-        currentHealth = maxHealth;
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        currentHealth = maxHealth;
     }
 
     void Update()
     {
-        CheckPlayerInRange();
-
-        if (isPlayerInRange)
-        {
-            MoveTowardsPlayer();
-
-            if (canAttack)
-            {
-                AttackPlayer();
-            }
-        }
-    }
-
-    void CheckPlayerInRange()
-    {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= detectionRange)
         {
-            isPlayerInRange = true;
+            Vector3 direction = (player.position - transform.position).normalized;
+            transform.position += direction * speed * Time.deltaTime;
+
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * speed);
         }
-        else
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player") && Time.time >= nextDamageTime)
         {
-            isPlayerInRange = false;
-        }
-    }
-
-    void MoveTowardsPlayer()
-    {
-        transform.LookAt(player.position);
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
-    }
-
-    void AttackPlayer()
-    {
-        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
-        {
-            playerHealth.TakeDamage(damageAmount);
-        }
-
-        canAttack = false;
-        Invoke("ResetAttack", attackCooldown);
-    }
-
-    void ResetAttack()
-    {
-        canAttack = true;
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+            PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(damageAmount);
+                nextDamageTime = Time.time + cooldownTime;
             }
         }
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int damage)
     {
-        currentHealth -= amount;
-
+        currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            Die();
+            Destroy(gameObject); // Destruye el enemigo cuando su salud llega a 0
         }
-    }
-
-    void Die()
-    {
-        Destroy(gameObject);
     }
 }

@@ -1,31 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 100;
-    public int currentHealth;
+    public int maxHealth = 3;
+    private int currentHealth;
+    public TextMeshProUGUI healthText; 
 
     void Start()
     {
         currentHealth = maxHealth;
+        UpdateHealthText();
     }
 
-    public void TakeDamage(int damageAmount)
+    public void TakeDamage(int damage)
     {
-        currentHealth -= damageAmount;
+        currentHealth -= damage;
+        UpdateHealthText(); 
 
         if (currentHealth <= 0)
         {
-            Die();
+            Cursor.lockState = CursorLockMode.None;
+            SceneManager.LoadScene("Derrota"); 
         }
     }
 
-    void Die()
+    void UpdateHealthText()
     {
-        SceneManager.LoadScene(2);
-
+        healthText.text = "HP: " + currentHealth.ToString();
     }
 }

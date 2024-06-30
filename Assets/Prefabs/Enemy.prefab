@@ -147,11 +147,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f88760f395ea7334ca52869e0a41be40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
-  moveSpeed: 3
-  detectionRange: 10
+  speed: 4
+  detectionRange: 150
   damageAmount: 1
-  attackCooldown: 1.5
 --- !u!54 &-615285643535850433
 Rigidbody:
   m_ObjectHideFlags: 0
