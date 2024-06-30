@@ -25,7 +25,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        // Aquí puedes añadir efectos visuales, sonidos, etc., antes de cambiar de escena
         SceneManager.LoadScene(2);
+
     }
 }
